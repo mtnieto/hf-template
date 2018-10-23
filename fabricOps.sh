@@ -20,7 +20,7 @@ FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric
 
 
 function pullDockerImages(){
-  local FABRIC_TAG="x86_64-1.1.0"
+  local FABRIC_TAG="1.2.0"
   for IMAGES in peer orderer ccenv tools ca; do
       echo "==> FABRIC IMAGE: $IMAGES"
       echo
@@ -87,14 +87,22 @@ function generateChannelArtifacts(){
 	echo "### Generating channel configuration transaction 'channel.tx' ###"
 	echo "#################################################################"
 
-    $GOPATH/bin/configtxgen -profile TwoOrgsOrdererGenesis -outputBlock ./channel-artifacts/genesis.block
+    $GOPATH/bin/configtxgen -profile TwoOrgsOrdererGenesis -channelID my-syschan -outputBlock ./channel-artifacts/genesis.block
+    $GOPATH/bin/configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel-artifacts/channel.tx -channelID "mychannel"
+
 
     echo
 	echo "#################################################################"
 	echo "#######    Generating anchor peer update for Org1MSP   ##########"
 	echo "#################################################################"
-    $GOPATH/bin/configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel-artifacts/channel.tx -channelID "mychannel"
+	$GOPATH/bin/configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org1MSPanchors.tx  -channelID "mychannel" -asOrg Org1MSP
 
+	echo
+	echo "#################################################################"
+	echo "#######    Generating anchor peer update for Org2MSP   ##########"
+	echo "#################################################################"
+	$GOPATH/bin/configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org2MSPanchors.tx  -channelID "mychannel" -asOrg Org2MSP
+	echo
 }
 
 function startNetwork() {
