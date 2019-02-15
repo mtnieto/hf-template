@@ -20,7 +20,7 @@ FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric
 
 
 function pullDockerImages(){
-  local FABRIC_TAG="1.3.0"
+  local FABRIC_TAG="1.4.0"
   for IMAGES in peer orderer ccenv tools ca; do
       echo "==> FABRIC IMAGE: $IMAGES"
       echo
@@ -33,12 +33,12 @@ function replacePrivateKey () {
 
     echo # Replace key
 
-	# ARCH=`uname -s | grep Darwin`
-	# if [ "$ARCH" == "Darwin" ]; then
-	# 	OPTS="-it"
-	# else
+	ARCH=`uname -s | grep Darwin`
+	if [ "$ARCH" == "Darwin" ]; then
+		OPTS="-it"
+	else
 		OPTS="-i"
-	# fi
+	fi
 
 	cp docker-compose-template.yaml docker-compose.yaml
 
