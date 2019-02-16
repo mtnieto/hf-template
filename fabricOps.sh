@@ -16,7 +16,7 @@ function verifyArg() {
 }
 
 OS_ARCH=$(echo "$(uname -s|tr '[:upper:]' '[:lower:]'|sed 's/mingw64_nt.*/windows/')-$(uname -m | sed 's/x86_64/amd64/g')" | awk '{print tolower($0)}')
-FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric
+FABRIC_ROOT=$GOPATH/src/xgithub.com/hyperledger/fabric
 
 
 function pullDockerImages(){
@@ -43,11 +43,11 @@ function replacePrivateKey () {
 	cp docker-compose-template.yaml docker-compose.yaml
 
     CURRENT_DIR=$PWD
-    cd crypto-config/peerOrganizations/org1.example.com/ca/
+    cd crypto-config/peerOrganizations/cepsa.petrocracks.com/ca/
     PRIV_KEY=$(ls *_sk)
     cd $CURRENT_DIR
     sed $OPTS "s/CA1_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose.yaml
-    cd crypto-config/peerOrganizations/org2.example.com/ca/
+    cd crypto-config/peerOrganizations/repsol.petrocracks.com/ca/
     PRIV_KEY=$(ls *_sk)
     cd $CURRENT_DIR
     sed $OPTS "s/CA2_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose.yaml
@@ -88,20 +88,20 @@ function generateChannelArtifacts(){
 	echo "#################################################################"
 
     $GOPATH/bin/configtxgen -profile TwoOrgsOrdererGenesis -channelID my-syschan -outputBlock ./channel-artifacts/genesis.block
-    $GOPATH/bin/configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel-artifacts/channel.tx -channelID "mychannel"
+    $GOPATH/bin/configtxgen -profile petrochannel -outputCreateChannelTx ./channel-artifacts/petrochannel.tx -channelID "petrochannel"
 
 
     echo
 	echo "#################################################################"
-	echo "#######    Generating anchor peer update for Org1MSP   ##########"
+	echo "#######    Generating anchor peer update for cepsaMSP   ##########"
 	echo "#################################################################"
-	$GOPATH/bin/configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org1MSPanchors.tx  -channelID "mychannel" -asOrg Org1MSP
+	$GOPATH/bin/configtxgen -profile petrochannel -outputAnchorPeersUpdate ./channel-artifacts/cepsaMSPanchors.tx  -channelID "petrochannel" -asOrg cepsaMSP
 
 	echo
 	echo "#################################################################"
-	echo "#######    Generating anchor peer update for Org2MSP   ##########"
+	echo "#######    Generating anchor peer update for repsolMSP   ##########"
 	echo "#################################################################"
-	$GOPATH/bin/configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org2MSPanchors.tx  -channelID "mychannel" -asOrg Org2MSP
+	$GOPATH/bin/configtxgen -profile petrochannel -outputAnchorPeersUpdate ./channel-artifacts/repsolMSPanchors.tx  -channelID "petrochannel" -asOrg repsolMSP
 	echo
 }
 
@@ -146,7 +146,7 @@ function cleanNetwork() {
     docker rmi -f $(docker images -q)
     
     # This removes containers used to support the running chaincode.
-    #docker rm -f $(docker ps --filter "name=dev" --filter "name=peer0.org1.example.com" --filter "name=cli" --filter "name=orderer.example.com" -q)
+    #docker rm -f $(docker ps --filter "name=dev" --filter "name=peer0.cepsa.petrocracks.com" --filter "name=cli" --filter "name=orderer.petrocracks.com" -q)
 
     # This removes only images hosting a running chaincode, and in this
     # particular case has the prefix dev-* 
